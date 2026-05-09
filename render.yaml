@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: raggroww-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r phase4_backend_api/requirements.txt
+    startCommand: python -m uvicorn phase4_backend_api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: ALLOWED_ORIGINS
+        value: https://YOUR_VERCEL_DOMAIN
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "30"
+      # Set GROQ_API_KEY in the Render dashboard (do not hardcode here).
