@@ -9,6 +9,7 @@ phase1_data_ingestion/data/vectorstore/
 phase1_data_ingestion/data/raw/
 phase1_data_ingestion/data/cleaned/
 phase1_data_ingestion/data/chunks/
+data/vectorstore/
 
 # Node
 **/node_modules/
