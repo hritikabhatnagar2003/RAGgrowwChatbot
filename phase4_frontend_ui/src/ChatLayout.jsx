@@ -145,7 +145,12 @@ export default function ChatLayout() {
                   {msg.source_url && (
                     <button 
                       className="view-source-btn"
-                      onClick={() => setShowPreview(true)}
+                      onClick={() => {
+                        // Open the actual source URL in a new tab
+                        window.open(msg.source_url, '_blank', 'noopener,noreferrer');
+                        // Keep the preview panel behavior as well
+                        setShowPreview(true);
+                      }}
                     >
                       <FileText size={14} /> View Source
                     </button>
