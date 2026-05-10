@@ -38,11 +38,12 @@ logger = logging.getLogger(__name__)
 router = None
 retriever = None
 generator = None
+_startup_complete = False  # guards health check during slow model loading
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Load models and clients on startup."""
-    global router, retriever, generator
+    global router, retriever, generator, _startup_complete
     logger.info("Initializing Backend Services...")
     try:
         if os.environ.get("TEST_MODE") == "1":
@@ -72,6 +73,7 @@ async def lifespan(app: FastAPI):
             retriever = Retriever()
             generator = Generator()
         logger.info("All services initialized successfully.")
+        _startup_complete = True
     except Exception as e:
         logger.error(f"Failed to initialize services: {e}")
         raise RuntimeError("Startup failed.")
@@ -113,6 +115,11 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 @app.get("/api/health")
 async def health_check():
     """Simple health check endpoint."""
+    if not _startup_complete:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "starting", "message": "Services are initializing, please wait..."}
+        )
     return {"status": "ok", "message": "Mutual Fund FAQ API is running."}
 
 @app.get("/api/examples")
