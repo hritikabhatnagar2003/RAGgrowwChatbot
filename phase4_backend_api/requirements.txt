@@ -1,5 +1,6 @@
-# Phase 4 Backend API Dependencies
+--extra-index-url https://download.pytorch.org/whl/cpu
 
+# Phase 4 Backend API Dependencies
 fastapi>=0.100.0
 uvicorn>=0.23.0
 pydantic>=2.0.0

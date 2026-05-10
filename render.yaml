@@ -4,7 +4,7 @@ services:
     name: raggroww-backend
     env: python
     plan: free
-    buildCommand: "pip install -r phase4_backend_api/requirements.txt"
+    buildCommand: "pip install --no-cache-dir -r phase4_backend_api/requirements.txt"
     startCommand: "python -m uvicorn phase4_backend_api.main:app --host 0.0.0.0 --port $PORT"
     healthCheckPath: /api/health
     envVars:
