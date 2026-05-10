@@ -10,6 +10,10 @@ from typing import List, Dict, Any
 
 import chromadb
 from sentence_transformers import SentenceTransformer
+import torch
+
+# Limit PyTorch to 1 thread to drastically reduce memory usage on Render free tier
+torch.set_num_threads(1)
 
 import config
 
