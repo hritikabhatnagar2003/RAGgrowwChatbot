@@ -1,0 +1,6 @@
+{
+  "extraPaths": [
+    "phase3_query_routing",
+    "phase2_rag_pipeline"
+  ]
+}

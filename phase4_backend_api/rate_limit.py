@@ -25,7 +25,7 @@ class _Bucket:
 class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, requests_per_minute: int = 30):
         super().__init__(app)
-        self.requests_per_minute = max(1, int(requests_per_minute))
+        self.requests_per_minute = max(1, requests_per_minute)
         self.window_seconds = 60.0
         self._by_ip: Dict[str, _Bucket] = {}
 

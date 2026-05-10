@@ -6,6 +6,7 @@ Glues together Phase 3 (Routing) and Phase 2 (RAG Pipeline).
 import sys
 import os
 import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -32,45 +33,13 @@ from phase4_backend_api.security import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Initialize FastAPI App
-app = FastAPI(
-    title="Mutual Fund FAQ API",
-    description="Backend API for the RAG-based MF chatbot.",
-    version="1.0.0"
-)
-
-# Phase 5: CORS locked to configured origins (no wildcard by default)
-allowed_origins_env = os.environ.get(
-    "ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173",
-)
-allowed_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Phase 5: Rate limiting (default 30 req/min per IP)
-rate_limit_per_min = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "30"))
-app.add_middleware(RateLimitMiddleware, requests_per_minute=rate_limit_per_min)
-
 # Global instances of our ML/Routing modules
 router = None
 retriever = None
 generator = None
 
-@app.exception_handler(Exception)
-async def unhandled_exception_handler(request: Request, exc: Exception):
-    # Phase 5: Avoid leaking internal stack traces to clients.
-    logger.error(f"Unhandled server error: {exc}")
-    return JSONResponse(status_code=500, content={"detail": "Internal server error."})
-
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """Load models and clients on startup."""
     global router, retriever, generator
     logger.info("Initializing Backend Services...")
@@ -105,6 +74,40 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Failed to initialize services: {e}")
         raise RuntimeError("Startup failed.")
+    yield
+
+# Initialize FastAPI App
+app = FastAPI(
+    title="Mutual Fund FAQ API",
+    description="Backend API for the RAG-based MF chatbot.",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Phase 5: CORS locked to configured origins (no wildcard by default)
+allowed_origins_env = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://127.0.0.1:5173",
+)
+allowed_origins = [o.strip() for o in allowed_origins_env.split(",") if o.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Phase 5: Rate limiting (default 30 req/min per IP)
+rate_limit_per_min = int(os.environ.get("RATE_LIMIT_PER_MINUTE", "30"))
+app.add_middleware(RateLimitMiddleware, requests_per_minute=rate_limit_per_min)
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    # Phase 5: Avoid leaking internal stack traces to clients.
+    logger.error(f"Unhandled server error: {exc}")
+    return JSONResponse(status_code=500, content={"detail": "Internal server error."})
 
 @app.get("/api/health")
 async def health_check():
@@ -116,10 +119,10 @@ async def get_examples():
     """Returns example questions for the frontend UI chips to test the system."""
     return {
         "examples": [
-            "Expense ratio for HDFC Mid-Cap?",
-            "Should I invest in HDFC Small Cap?",
-            "My PAN is ABCDE1234F. Check my KYC.",
-            "What is the capital of France?"
+            "What is the expense ratio of HDFC Mid-Cap Fund?",
+            "What is the exit load for HDFC Defence Fund?",
+            "Tell me about HDFC Nifty 50 Index Fund.",
+            "Compare HDFC Small Cap and Large Cap funds."
         ]
     }
 
@@ -136,6 +139,9 @@ async def chat_endpoint(request: ChatRequest):
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
     logger.info(f"Received query: '{query}'")
+
+    if router is None or retriever is None or generator is None:
+        raise HTTPException(status_code=503, detail="Services not initialized")
 
     # Phase 5: API-layer PII block (defense in depth; also covers account numbers)
     pii = detect_pii(query)

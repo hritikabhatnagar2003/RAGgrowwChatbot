@@ -178,7 +178,7 @@ export default function ChatLayout() {
             <div className="chips-container">
               {examples.map((ex, i) => (
                 <button key={i} className="chip" onClick={() => handleSend(ex)}>
-                  {ex.length > 25 ? ex.substring(0, 25) + '...' : ex}
+                  {ex}
                 </button>
               ))}
             </div>
