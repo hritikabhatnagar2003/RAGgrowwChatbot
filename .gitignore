@@ -4,12 +4,11 @@
 .pytest_cache/
 *.log
 
-# Local vectorstore / data artifacts
-phase1_data_ingestion/data/vectorstore/
+# Local vectorstore / data artifacts — raw/cleaned/chunks are gitignored
+# but vectorstore IS committed so Railway can use it at runtime
 phase1_data_ingestion/data/raw/
 phase1_data_ingestion/data/cleaned/
 phase1_data_ingestion/data/chunks/
-data/vectorstore/
 
 # Node
 **/node_modules/

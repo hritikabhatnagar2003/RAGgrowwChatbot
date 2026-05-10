@@ -1,0 +1,16 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# ── Phase 4: FastAPI Backend API ─────────────────────────────────────────────
+fastapi>=0.100.0
+uvicorn>=0.23.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+
+# ── Phase 2: RAG Pipeline ─────────────────────────────────────────────────────
+groq>=0.5.0
+sentence-transformers>=2.2.0
+chromadb>=0.4.0
+requests>=2.31.0
+
+# ── Phase 3: Query Routing ────────────────────────────────────────────────────
+# (uses groq + standard library only — already listed above)
