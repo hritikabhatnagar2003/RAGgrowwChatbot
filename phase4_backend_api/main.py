@@ -120,10 +120,10 @@ async def get_examples():
     """Returns example questions for the frontend UI chips to test the system."""
     return {
         "examples": [
-            "What is the expense ratio of HDFC Mid-Cap Fund?",
-            "What is the exit load for HDFC Defence Fund?",
-            "Tell me about HDFC Nifty 50 Index Fund.",
-            "Compare HDFC Small Cap and Large Cap funds."
+            "What is the current expense ratio of the HDFC Mid-Cap Opportunities Fund?",
+            "Can you tell me the exit load for the HDFC Defence Fund?",
+            "What is the minimum SIP amount required for the HDFC Nifty 50 Index Fund?",
+            "Who are the fund managers for the HDFC Small Cap Fund?"
         ]
     }
 
