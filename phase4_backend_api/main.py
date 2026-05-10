@@ -11,8 +11,9 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-# Add sibling directories to Python path so we can import our previous work
+# Add sibling directories and parent to Python path so we can import our previous work
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.abspath(os.path.join(BASE_DIR, "..")))
 sys.path.append(os.path.abspath(os.path.join(BASE_DIR, "..", "phase3_query_routing")))
 sys.path.append(os.path.abspath(os.path.join(BASE_DIR, "..", "phase2_rag_pipeline")))
 
